@@ -1,0 +1,4 @@
+What'S the difference between add_action and do_action a menu?
+What's a callback in wordpress?
+What does it mean to "prepare" or "escape" data against SQL injection?
+htmlspecialchars  research
