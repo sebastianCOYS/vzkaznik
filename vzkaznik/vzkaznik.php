@@ -5,11 +5,12 @@
 * Author: Sebastian T. Nguyen
 * version: 0.1
 */
+
 include_once("functions.php");
 //Vytvoří menu v admin side-panelu
 add_action("admin_menu", "create_vzkaznik_menu");
 add_action("admin_menu", "create_vzkaznik_settings_menu");
-//přidá "vzkazník"(formulář) do footeru
+//přidá "vzkazník"(formulář) do footeru všech pages
 add_action("wp_footer", "vzkaznik");
 //vytvoří table se vzkazy při aktivaci pluginu
 register_activation_hook( __FILE__, 'create_vzkaznik_table_in_db' );

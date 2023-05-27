@@ -30,11 +30,12 @@ function gen_vzkaznik_settings(){
 
 //Vytvoří formu
 function vzkaznik(){
-    echo '<form method="post" action="'. plugins_url() .'/vzkaznik/form_action.php">
+    echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">
+    <input type="hidden" name="action" value="vzkaznik_form">
     <label for="email">email:</label>
     <input type="email" id="email" name="email" required/>
     <label for="message">message:</label>
-    <input type="textarea" id="message" name="message" title="between 20 and 1000 characters" minlength="20" maxlength="1000" required/>
+    <textarea id="message" name="message" title="between 20 and 1000 characters" minlength="20" maxlength="1000" required></textarea>
     <input type="submit" />
   </form>';
 }
@@ -58,3 +59,36 @@ function create_vzkaznik_table_in_db(){
     dbDelta( $sql );
 }
 /****************************************************************** */
+//WP hook form handling via wp-admin
+//pouzil jsem https://www.sitepoint.com/handling-post-requests-the-wordpress-way/
+//ale místo theme functions.php je tento kod v plugin functions.php
+function prefix_post_data_to_db() {
+    global $wpdb;
+    $error = 0;
+    if(!isset($_POST['message']) OR !isset($_POST['email'])){
+        $error++;
+    } 
+
+    if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        $error++;
+    }
+
+    if (empty($_POST['message']) OR strlen($_POST['message']) < 20 OR strlen($_POST['message']) > 1000 ) {
+        $error++;
+    }
+    if ($error === 0){
+        $message = $_POST['message'];
+        $email = $_POST['email'];
+        $date = date('Y-m-d H:i:s');
+        
+        $table_name = $wpdb->prefix . "vzkaznik";
+        $wpdb->insert($table_name, array('time' => $date, 'email' => $email, 'text' => $message ));
+    }
+
+    $home = home_url();
+    header("location:". $home);
+
+}
+
+add_action( 'admin_post_nopriv_vzkaznik_form', 'prefix_post_data_to_db' );
+add_action( 'admin_post_vzkaznik_form', 'prefix_post_data_to_db' );
